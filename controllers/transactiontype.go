@@ -95,7 +95,7 @@ func EditTransactionType(c *gin.Context) {
 		UpdatedAt:           time.Now()}
 	c.BindJSON(&transactionType)
 
-	res, err := database.DB.NewUpdate().Model(transactionType).WherePK().Exec(c)
+	res, err := database.DB.NewUpdate().Model(transactionType).OmitZero().WherePK().Exec(c)
 	row, _ := res.RowsAffected()
 
 	if err != nil {

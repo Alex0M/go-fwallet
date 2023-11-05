@@ -161,33 +161,39 @@ func CreateTransaction(c *gin.Context) {
 	})
 }
 
-/*
-ToDo: Update EditTransaction API
+func EditTransaction(c *gin.Context) {
+	transactionId, _ := strconv.Atoi(c.Param("transactionID"))
+	transaction := &Transaction{
+		ID:        transactionId,
+		UpdatedAt: time.Now(),
+	}
+	c.BindJSON(&transaction)
 
-	func EditTransaction(c *gin.Context) {
-		transactionId, _ := strconv.Atoi(c.Param("transactionID"))
-		log.Println(transactionId)
-		transaction := &Transaction{ID: transactionId}
-		c.BindJSON(&transaction)
-		log.Println(transaction)
-
-		_, err := dbConnect.Model(transaction).WherePK().Update()
-		if err != nil {
-			log.Printf("Error while updating a transaction, Reason: %v\n", err)
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"status":  500,
-				"message": "Something went wrong",
-			})
-			return
-		}
-
-		c.JSON(http.StatusOK, gin.H{
-			"status":  200,
-			"message": "Transaction Edited Successfully",
+	res, err := database.DB.NewUpdate().Model(transaction).OmitZero().WherePK().Exec(c)
+	row, _ := res.RowsAffected()
+	if err != nil {
+		log.Printf("Error while updating a transaction, Reason: %v\n", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  500,
+			"message": "Something went wrong",
 		})
 		return
 	}
-*/
+
+	if row == 0 {
+		c.JSON(http.StatusNotFound, gin.H{
+			"status":  http.StatusNotFound,
+			"message": "Transaction not found",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  200,
+		"message": "Transaction Edited Successfully",
+	})
+}
+
 func DeleteTransaction(c *gin.Context) {
 	transactionId, _ := strconv.Atoi(c.Param("transactionID"))
 	transaction := new(Transaction)

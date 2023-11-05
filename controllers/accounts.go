@@ -99,7 +99,7 @@ func EditAccount(c *gin.Context) {
 	}
 	c.BindJSON(&account)
 
-	res, err := database.DB.NewUpdate().Model(account).WherePK().Exec(c)
+	res, err := database.DB.NewUpdate().Model(account).OmitZero().WherePK().Exec(c)
 	row, _ := res.RowsAffected()
 
 	if err != nil {

@@ -125,7 +125,7 @@ func EditCategory(c *gin.Context) {
 	}
 	c.BindJSON(&category)
 
-	res, err := database.DB.NewUpdate().Model(category).WherePK().Exec(c)
+	res, err := database.DB.NewUpdate().Model(category).OmitZero().WherePK().Exec(c)
 	row, _ := res.RowsAffected()
 
 	if err != nil {

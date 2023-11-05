@@ -51,7 +51,7 @@ func Routes(router *gin.Engine) {
 	router.GET("/transactions/SumByCategory", controllers.GetSumOfTransactionsByCategory)
 	router.GET("/category/:categoryID/transactions", controllers.GetAllTransaction)
 	router.POST("/transactions", controllers.CreateTransaction)
-	//router.PUT("/transactions/:transactionID", controllers.EditTransaction)
+	router.PUT("/transactions/:transactionID", controllers.EditTransaction)
 	router.DELETE("/transactions/:transactionID", controllers.DeleteTransaction)
 	router.POST("/transactions/updateCategory", controllers.UpdateTransactionCategory)
 

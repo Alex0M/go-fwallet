@@ -114,7 +114,7 @@ func EditUser(c *gin.Context) {
 
 	user.Password = helpers.HashAndSalt([]byte(user.Password))
 
-	res, err := database.DB.NewUpdate().Model(user).WherePK().Exec(c)
+	res, err := database.DB.NewUpdate().Model(user).OmitZero().WherePK().Exec(c)
 	row, _ := res.RowsAffected()
 
 	if err != nil {
