@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	database "go-fwallet/internal/db"
+	"go-fwallet/internal/database"
 
 	"github.com/gin-gonic/gin"
 )

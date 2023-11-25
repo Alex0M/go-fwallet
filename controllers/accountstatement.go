@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	database "go-fwallet/internal/db"
+	"go-fwallet/internal/database"
 	"log"
 	"net/http"
 	"time"

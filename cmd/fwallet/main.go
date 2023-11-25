@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"go-fwallet/internal/controllers/accounts"
-	db "go-fwallet/internal/db"
+	"go-fwallet/internal/database"
 	routes "go-fwallet/routes"
 
 	"github.com/gin-gonic/gin"
@@ -22,7 +22,7 @@ func main() {
 		log.Fatalf("error creating logger: %s", err)
 	}
 
-	db := db.Init(dsn, l)
+	db := database.Init(dsn, l)
 	err = db.Ping()
 	if err != nil {
 		log.Fatalf("Cannot connect to DB. %s", err)

@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	database "go-fwallet/internal/db"
+	"go-fwallet/internal/database"
 
 	"github.com/gin-gonic/gin"
 	"github.com/uptrace/bun"
