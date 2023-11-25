@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"time"
 
-	database "go-fwallet/database"
-	helpers "go-fwallet/helpers"
+	database "go-fwallet/internal/db"
+	helpers "go-fwallet/internal/helpers"
 
 	"github.com/gin-gonic/gin"
 )

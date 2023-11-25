@@ -7,8 +7,11 @@ require (
 	github.com/uptrace/bun v1.1.9
 	github.com/uptrace/bun/dialect/pgdialect v1.1.9
 	github.com/uptrace/bun/driver/pgdriver v1.1.9
+	go.uber.org/zap v1.26.0
 	golang.org/x/crypto v0.5.0
 )
+
+require go.uber.org/multierr v1.10.0 // indirect
 
 require (
 	github.com/gin-contrib/cors v1.4.0

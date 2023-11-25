@@ -1,7 +1,9 @@
 package helpers
 
 import (
+	"fmt"
 	"log"
+	"strconv"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -13,4 +15,13 @@ func HashAndSalt(pass []byte) string {
 	}
 
 	return string(hashed)
+}
+
+func StringToInt(s string) (int, error) {
+	n, err := strconv.Atoi(s)
+	if err != nil {
+		return -1, fmt.Errorf("cannot convert string %s to int", s)
+	}
+
+	return n, nil
 }

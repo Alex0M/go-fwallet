@@ -4,7 +4,7 @@ RUN mkdir /build
 ADD . /build/
 WORKDIR /build
 RUN go mod tidy
-RUN go build -a -o fwallet .
+RUN go build -a -o fwallet ./cmd/fwallet/main.go
 
 
 # final image
