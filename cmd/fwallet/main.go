@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"go-fwallet/internal/controllers/accounts"
 	"go-fwallet/internal/database"
 	routes "go-fwallet/routes"
 
+	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -28,7 +30,8 @@ func main() {
 		log.Fatalf("Cannot connect to DB. %s", err)
 	}
 
-	r := gin.Default()
+	r := gin.New()
+	r.Use(ginzap.Ginzap(l, time.RFC3339, true))
 	accounts.RegisterRoutes(r, db)
 
 	routes.Routes(r)
