@@ -43,6 +43,7 @@ func (d *Database) GetSingleAccount(idStr string, c context.Context) (*models.Ac
 }
 
 func (d *Database) AddAccount(a *models.Account, c context.Context) error {
+	d.Logger.Info("starting addding new account intoDB", zap.Any("account", a))
 	_, err := d.Client.NewInsert().Model(a).Exec(c)
 	if err != nil {
 		d.Logger.Error("error while inserting new account into db", zap.Error(err))

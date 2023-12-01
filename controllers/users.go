@@ -49,7 +49,7 @@ func CreateUser(c *gin.Context) {
 	var user User
 	c.BindJSON(&user)
 
-	user.Password = helpers.HashAndSalt([]byte(user.Password))
+	user.Password, _ = helpers.HashAndSalt([]byte(user.Password))
 	/*
 		userInsert := User{
 			Username: user.Username,
@@ -112,7 +112,7 @@ func EditUser(c *gin.Context) {
 	}
 	c.BindJSON(&user)
 
-	user.Password = helpers.HashAndSalt([]byte(user.Password))
+	user.Password, _ = helpers.HashAndSalt([]byte(user.Password))
 
 	res, err := database.DB.NewUpdate().Model(user).OmitZero().WherePK().Exec(c)
 	row, _ := res.RowsAffected()

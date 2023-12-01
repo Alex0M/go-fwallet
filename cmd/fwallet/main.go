@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"go-fwallet/internal/controllers/accounts"
+	"go-fwallet/internal/controllers/transactions"
 	"go-fwallet/internal/database"
 	routes "go-fwallet/routes"
 
@@ -33,6 +34,7 @@ func main() {
 	r := gin.New()
 	r.Use(ginzap.Ginzap(l, time.RFC3339, true))
 	accounts.RegisterRoutes(r, db)
+	transactions.RegisterRoutes(r, db)
 
 	routes.Routes(r)
 	//Move Servier IP and Port to config
