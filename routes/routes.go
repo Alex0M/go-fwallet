@@ -34,13 +34,6 @@ func Routes(router *gin.Engine) {
 	router.PUT("/transactiontypes/:transactionTypeCode", controllers.EditTransactionType)
 	router.DELETE("/transactiontypes/:transactionTypeCode", controllers.DeleteTransactionType)
 
-	router.GET("/categories", controllers.GetAllCategories)
-	router.POST("/categories", controllers.CreateCategory)
-	router.GET("/categories/:categoryID", controllers.GetSingleCategory)
-	router.GET("/categories/name/:categoryName", controllers.GetSingleCategoryByName)
-	router.PUT("/categories/:categoryID", controllers.EditCategory)
-	router.DELETE("/categories/:categoryID", controllers.DeleteCategory)
-
 	router.GET("/accountstatements", controllers.GetAccountsStatement)
 	router.POST("/accountstatements", controllers.CreateAccountsStatement)
 
