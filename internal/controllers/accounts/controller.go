@@ -16,7 +16,7 @@ func RegisterRoutes(r *gin.Engine, db *database.Database) {
 	}
 
 	routes := r.Group("/accounts")
-	routes.GET("/", h.GetAccounts)
+	routes.GET("", h.GetAccounts)
 	routes.POST("/", h.AddAcount)
 	routes.GET("/:id", h.GetSingleAccount)
 	routes.PUT("/:id", h.EditAccount)

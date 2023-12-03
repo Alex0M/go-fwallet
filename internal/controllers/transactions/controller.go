@@ -16,7 +16,7 @@ func RegisterRoutes(r *gin.Engine, db *database.Database) {
 	}
 
 	routes := r.Group("/transactions")
-	routes.GET("/", h.GetAllTransaction)
+	routes.GET("", h.GetAllTransaction)
 	routes.GET("/:id", h.GetTransaction)
 	routes.GET("/SumByCategory", h.GetSumOfTransactionsByCategory)
 	routes.POST("/", h.AddTransaction)

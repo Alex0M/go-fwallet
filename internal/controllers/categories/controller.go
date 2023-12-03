@@ -16,7 +16,7 @@ func RegisterRoutes(r *gin.Engine, db *database.Database) {
 	}
 
 	routes := r.Group("/categories")
-	routes.GET("/", h.GetCategories)
+	routes.GET("", h.GetCategories)
 	routes.GET("/:id", h.GetCategory)
 	routes.GET("/name/:name", h.GetCategoryByName)
 	routes.POST("/", h.AddCategory)

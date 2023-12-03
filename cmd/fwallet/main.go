@@ -12,6 +12,7 @@ import (
 	"go-fwallet/internal/database"
 	routes "go-fwallet/routes"
 
+	"github.com/gin-contrib/cors"
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -34,6 +35,15 @@ func main() {
 
 	r := gin.New()
 	r.Use(ginzap.Ginzap(l, time.RFC3339, true))
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposeHeaders:    []string{"Link"},
+		AllowCredentials: true,
+		MaxAge:           300,
+	}))
+
 	accounts.RegisterRoutes(r, db)
 	transactions.RegisterRoutes(r, db)
 	categories.RegisterRoutes(r, db)
