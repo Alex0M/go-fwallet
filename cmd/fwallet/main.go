@@ -9,6 +9,7 @@ import (
 	"go-fwallet/internal/controllers/accounts"
 	"go-fwallet/internal/controllers/categories"
 	"go-fwallet/internal/controllers/transactions"
+	"go-fwallet/internal/controllers/users"
 	"go-fwallet/internal/database"
 	routes "go-fwallet/routes"
 
@@ -47,6 +48,7 @@ func main() {
 	accounts.RegisterRoutes(r, db)
 	transactions.RegisterRoutes(r, db)
 	categories.RegisterRoutes(r, db)
+	users.RegisterRoutes(r, db)
 
 	routes.Routes(r)
 	//Move Servier IP and Port to config

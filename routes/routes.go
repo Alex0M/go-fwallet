@@ -21,12 +21,6 @@ func Routes(router *gin.Engine) {
 
 	router.GET("/", welcome)
 
-	router.GET("/users", controllers.GetAllUsers)
-	router.POST("/users", controllers.CreateUser)
-	router.GET("/users/:userId", controllers.GetSingleUser)
-	router.PUT("/users/:userId", controllers.EditUser)
-	router.DELETE("/users/:userId", controllers.DeleteUser)
-
 	router.GET("/transactiontypes", controllers.GetAllTransactionTypes)
 	router.POST("/transactiontypes", controllers.CreateTransactionType)
 	router.GET("/transactiontypes/:transactionTypeCode", controllers.GetSingleTransactionType)
