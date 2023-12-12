@@ -8,11 +8,11 @@ import (
 
 	"go-fwallet/internal/controllers/accounts"
 	"go-fwallet/internal/controllers/categories"
+	commoncontroller "go-fwallet/internal/controllers/common_controller"
 	"go-fwallet/internal/controllers/transactions"
 	"go-fwallet/internal/controllers/transactiontypes"
 	"go-fwallet/internal/controllers/users"
 	"go-fwallet/internal/database"
-	routes "go-fwallet/routes"
 
 	"github.com/gin-contrib/cors"
 	ginzap "github.com/gin-contrib/zap"
@@ -51,8 +51,8 @@ func main() {
 	categories.RegisterRoutes(r, db)
 	users.RegisterRoutes(r, db)
 	transactiontypes.RegisterRoutes(r, db)
+	commoncontroller.RegisterRoutes(r, nil)
 
-	routes.Routes(r)
 	//Move Servier IP and Port to config
 	log.Fatal(r.Run("0.0.0.0:9090"))
 }
