@@ -19,7 +19,7 @@ func RegisterRoutes(r *gin.Engine, db *database.Database) {
 	routes.GET("", h.GetAllTransaction)
 	routes.GET("/:id", h.GetTransaction)
 	routes.GET("/SumByCategory", h.GetSumOfTransactionsByCategory)
-	routes.POST("/", h.AddTransaction)
+	routes.POST("", h.AddTransaction)
 	routes.PUT("/:id", h.EditTransaction)
 	routes.DELETE("/:id", h.DeleteTransaction)
 	routes.POST("/updateCategory", h.UpdateTransactionCategories)

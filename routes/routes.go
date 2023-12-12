@@ -20,13 +20,13 @@ func Routes(router *gin.Engine) {
 	})) */
 
 	router.GET("/", welcome)
-
-	router.GET("/transactiontypes", controllers.GetAllTransactionTypes)
-	router.POST("/transactiontypes", controllers.CreateTransactionType)
-	router.GET("/transactiontypes/:transactionTypeCode", controllers.GetSingleTransactionType)
-	router.PUT("/transactiontypes/:transactionTypeCode", controllers.EditTransactionType)
-	router.DELETE("/transactiontypes/:transactionTypeCode", controllers.DeleteTransactionType)
-
+	/*
+		router.GET("/transactiontypes", controllers.GetAllTransactionTypes)
+		router.POST("/transactiontypes", controllers.CreateTransactionType)
+		router.GET("/transactiontypes/:transactionTypeCode", controllers.GetSingleTransactionType)
+		router.PUT("/transactiontypes/:transactionTypeCode", controllers.EditTransactionType)
+		router.DELETE("/transactiontypes/:transactionTypeCode", controllers.DeleteTransactionType)
+	*/
 	router.GET("/accountstatements", controllers.GetAccountsStatement)
 	router.POST("/accountstatements", controllers.CreateAccountsStatement)
 
