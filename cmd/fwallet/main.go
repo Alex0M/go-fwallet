@@ -13,6 +13,7 @@ import (
 	"go-fwallet/internal/controllers/transactiontypes"
 	"go-fwallet/internal/controllers/users"
 	"go-fwallet/internal/database"
+	"go-fwallet/internal/middleware"
 
 	"github.com/gin-contrib/cors"
 	ginzap "github.com/gin-contrib/zap"
@@ -24,19 +25,20 @@ func main() {
 	//Move to config package
 	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", os.Getenv("DB_USER"), os.Getenv("DB_PASS"), os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_NAME"))
 
-	l, err := zap.NewProduction()
+	logger, err := zap.NewProduction()
 	if err != nil {
 		log.Fatalf("error creating logger: %s", err)
 	}
 
-	db := database.Init(dsn, l)
+	db := database.Init(dsn, logger)
 	err = db.Ping()
 	if err != nil {
 		log.Fatalf("Cannot connect to DB. %s", err)
 	}
 
 	r := gin.New()
-	r.Use(ginzap.Ginzap(l, time.RFC3339, true))
+	r.Use(ginzap.Ginzap(logger, time.RFC3339, true))
+	r.Use(middleware.ErrorHandler(logger))
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
