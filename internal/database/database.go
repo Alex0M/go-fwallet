@@ -10,9 +10,6 @@ import (
 	"go.uber.org/zap"
 )
 
-// Need to delete after refactoing all handlers
-var DB *bun.DB
-
 var ErrValidateID = fmt.Errorf("cannot conver id to int")
 
 type Database struct {
