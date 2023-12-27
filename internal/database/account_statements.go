@@ -4,8 +4,6 @@ import (
 	"context"
 	"go-fwallet/internal/models"
 	"time"
-
-	"go.uber.org/zap"
 )
 
 func (d *Database) GetAccountsStatements(closingDate string, isClosingDateSpecify bool, c context.Context) ([]models.AccountStatement, error) {
@@ -18,7 +16,6 @@ func (d *Database) GetAccountsStatements(closingDate string, isClosingDateSpecif
 
 	err := q.Order("closing_date").Scan(c)
 	if err != nil {
-		d.Logger.Error("error while getting all accounts statements", zap.Error(err))
 		return nil, err
 	}
 
@@ -33,13 +30,11 @@ func (d *Database) CreateAccountsStatements(rp *models.AccountStatementRequestPa
 		rp.GteDate, rp.LteDate,
 	).Scan(c, &ass)
 	if err != nil {
-		d.Logger.Error("error reading transactions to create account statements from DB:", zap.Error(err))
 		return nil, err
 	}
 
 	closingDate, err := time.Parse("2006-01-02", rp.LteDate)
 	if err != nil {
-		d.Logger.Error("Error parsing LteDate:", zap.Error(err))
 		return nil, err
 	}
 
@@ -50,7 +45,6 @@ func (d *Database) CreateAccountsStatements(rp *models.AccountStatementRequestPa
 
 	_, err = d.Client.NewInsert().Model(&ass).Exec(c)
 	if err != nil {
-		d.Logger.Error("error while creating accounts statements", zap.Error(err))
 		return nil, err
 	}
 

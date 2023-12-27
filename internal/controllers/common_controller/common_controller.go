@@ -1,7 +1,8 @@
 package commoncontroller
 
 import (
-	"go-fwallet/internal/response"
+	"fmt"
+	"go-fwallet/internal/middleware"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -15,5 +16,6 @@ func (h *Handler) Welcome(c *gin.Context) {
 }
 
 func (h *Handler) NotFound(c *gin.Context) {
-	c.JSON(http.StatusNotFound, response.NotFound())
+	e := middleware.NewHttpError("not found", fmt.Sprintf("urlPath:%s", c.Request.URL.Path), http.StatusNotFound)
+	c.Error(e)
 }

@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"fmt"
+	"go-fwallet/internal/response"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -33,7 +34,7 @@ func ErrorHandler(logger *zap.Logger) gin.HandlerFunc {
 			switch e := err.Err.(type) {
 			case HttpError:
 				logger.Error("API HTTP error", zap.Error(e))
-				c.AbortWithStatusJSON(e.StatusCode, e)
+				c.AbortWithStatusJSON(e.StatusCode, response.ErrorResponse(e))
 			default:
 				logger.Error("internal server error", zap.Error(e))
 				c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]string{"message": "Internal Server Error"})

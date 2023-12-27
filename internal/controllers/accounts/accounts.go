@@ -33,8 +33,8 @@ func (h *Handler) GetSingleAccount(c *gin.Context) {
 func (h *Handler) AddAcount(c *gin.Context) {
 	var account models.Account
 	if err := c.BindJSON(&account); err != nil {
-		err := middleware.NewHttpError("bad request", err.Error(), http.StatusBadRequest)
-		c.Error(err)
+		e := middleware.NewHttpError("bad request", err.Error(), http.StatusBadRequest)
+		c.Error(e)
 		return
 	}
 
@@ -53,8 +53,8 @@ func (h *Handler) EditAccount(c *gin.Context) {
 	}
 
 	if err := c.BindJSON(&a); err != nil {
-		err := middleware.NewHttpError("bad request", err.Error(), http.StatusBadRequest)
-		c.Error(err)
+		e := middleware.NewHttpError("bad request", err.Error(), http.StatusBadRequest)
+		c.Error(e)
 		return
 	}
 
