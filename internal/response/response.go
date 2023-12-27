@@ -4,20 +4,11 @@ import (
 	"go-fwallet/internal/models"
 )
 
-func NotFound() models.Response {
-	return models.Response{
-		Status:  false,
-		Message: "Not Found",
-	}
-}
-
-func ErrorResponse(e string) models.Response {
+func ErrorResponse(e error) models.Response {
 	return models.Response{
 		Status:  false,
 		Message: "Error",
-		Data: models.ErrorResponse{
-			Error: e,
-		},
+		Data:    e,
 	}
 }
 

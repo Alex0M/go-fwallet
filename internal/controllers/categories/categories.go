@@ -1,20 +1,19 @@
 package categories
 
 import (
-	"fmt"
+	"go-fwallet/internal/middleware"
 	"go-fwallet/internal/models"
 	"go-fwallet/internal/response"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 )
 
 func (h *Handler) GetCategories(c *gin.Context) {
 	cats, err := h.DB.GetCategories(c.Request.Context())
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse("Internal server error"))
+		c.Error(err)
 		return
 	}
 
@@ -24,16 +23,7 @@ func (h *Handler) GetCategories(c *gin.Context) {
 func (h *Handler) GetCategory(c *gin.Context) {
 	cat, err := h.DB.GetCategory(c.Param("id"), c.Request.Context())
 	if err != nil {
-		if err == h.DB.GetErrValidateID() {
-			c.JSON(http.StatusBadRequest, response.ErrorResponse(h.DB.GetErrValidateID().Error()))
-			return
-		}
-		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse("Internal server error"))
-		return
-	}
-
-	if cat == nil {
-		c.JSON(http.StatusNotFound, response.NotFound())
+		c.Error(err)
 		return
 	}
 
@@ -43,16 +33,7 @@ func (h *Handler) GetCategory(c *gin.Context) {
 func (h *Handler) GetCategoryByName(c *gin.Context) {
 	cat, err := h.DB.GetCategoryByName(c.Param("name"), c.Request.Context())
 	if err != nil {
-		if err == h.DB.GetErrValidateID() {
-			c.JSON(http.StatusBadRequest, response.ErrorResponse(h.DB.GetErrValidateID().Error()))
-			return
-		}
-		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse("Internal server error"))
-		return
-	}
-
-	if cat == nil {
-		c.JSON(http.StatusNotFound, response.NotFound())
+		c.Error(err)
 		return
 	}
 
@@ -62,14 +43,14 @@ func (h *Handler) GetCategoryByName(c *gin.Context) {
 func (h *Handler) AddCategory(c *gin.Context) {
 	var cat models.Category
 	if err := c.BindJSON(&cat); err != nil {
-		h.DB.Logger.Error("error bindJSON", zap.Error(err))
-		c.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse(fmt.Sprintf("Bad request: %s", err)))
+		e := middleware.NewHttpError("bad request", err.Error(), http.StatusBadRequest)
+		c.Error(e)
 		return
 	}
 
 	err := h.DB.AddCategory(&cat, c.Request.Context())
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse("Internal server error"))
+		c.Error(err)
 		return
 	}
 
@@ -82,23 +63,14 @@ func (h *Handler) EditCategory(c *gin.Context) {
 	}
 
 	if err := c.BindJSON(&cat); err != nil {
-		h.DB.Logger.Error("error bindJSON", zap.Error(err))
-		c.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse(fmt.Sprintf("Bad request: %s", err)))
+		e := middleware.NewHttpError("bad request", err.Error(), http.StatusBadRequest)
+		c.Error(e)
 		return
 	}
 
 	newCategory, err := h.DB.EditCategory(c.Param("id"), &cat, c.Request.Context())
 	if err != nil {
-		if err == h.DB.GetErrValidateID() {
-			c.JSON(http.StatusBadRequest, response.ErrorResponse(h.DB.GetErrValidateID().Error()))
-			return
-		}
-		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse("Internal server error"))
-		return
-	}
-
-	if newCategory == nil {
-		c.JSON(http.StatusNotFound, response.NotFound())
+		c.Error(err)
 		return
 	}
 
@@ -106,18 +78,9 @@ func (h *Handler) EditCategory(c *gin.Context) {
 }
 
 func (h *Handler) DeleteCategory(c *gin.Context) {
-	cat, err := h.DB.DeleteCategory(c.Param("id"), c.Request.Context())
+	err := h.DB.DeleteCategory(c.Param("id"), c.Request.Context())
 	if err != nil {
-		if err == h.DB.GetErrValidateID() {
-			c.JSON(http.StatusBadRequest, response.ErrorResponse(h.DB.GetErrValidateID().Error()))
-			return
-		}
-		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse("Internal server error"))
-		return
-	}
-
-	if cat == nil {
-		c.JSON(http.StatusNotFound, response.NotFound())
+		c.Error(err)
 		return
 	}
 

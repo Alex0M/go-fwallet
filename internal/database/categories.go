@@ -74,16 +74,16 @@ func (d *Database) EditCategory(idStr string, newCategory *models.Category, c co
 	return newCategory, nil
 }
 
-func (d *Database) DeleteCategory(idStr string, c context.Context) (*models.Category, error) {
+func (d *Database) DeleteCategory(idStr string, c context.Context) error {
 	cat, err := d.GetCategory(idStr, c)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	_, err = d.Client.NewDelete().Model(cat).WherePK().Exec(c)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return cat, nil
+	return nil
 }

@@ -1,20 +1,19 @@
 package users
 
 import (
-	"fmt"
+	"go-fwallet/internal/middleware"
 	"go-fwallet/internal/models"
 	"go-fwallet/internal/response"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 )
 
 func (h *Handler) GetUsers(c *gin.Context) {
 	acc, err := h.DB.GetUsers(c.Request.Context())
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse("Internal server error"))
+		c.Error(err)
 		return
 	}
 
@@ -24,16 +23,7 @@ func (h *Handler) GetUsers(c *gin.Context) {
 func (h *Handler) GetUser(c *gin.Context) {
 	u, err := h.DB.GetUser(c.Param("id"), c.Request.Context())
 	if err != nil {
-		if err == h.DB.GetErrValidateID() {
-			c.JSON(http.StatusBadRequest, response.ErrorResponse(h.DB.GetErrValidateID().Error()))
-			return
-		}
-		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse("Internal server error"))
-		return
-	}
-
-	if u == nil {
-		c.JSON(http.StatusNotFound, response.NotFound())
+		c.Error(err)
 		return
 	}
 
@@ -43,15 +33,14 @@ func (h *Handler) GetUser(c *gin.Context) {
 func (h *Handler) AddUser(c *gin.Context) {
 	var u models.User
 	if err := c.BindJSON(&u); err != nil {
-		h.DB.Logger.Error("error bindJSON", zap.Error(err))
-		c.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse(fmt.Sprintf("Bad request: %s", err)))
+		e := middleware.NewHttpError("bad request", err.Error(), http.StatusBadRequest)
+		c.Error(e)
 		return
 	}
 
 	err := h.DB.AddUser(&u, c.Request.Context())
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse("Internal server error"))
-		return
+		c.Error(err)
 	}
 
 	c.JSON(http.StatusCreated, response.SuccessResponse("User was created successfully", nil))
@@ -61,25 +50,16 @@ func (h *Handler) EditUser(c *gin.Context) {
 	var u = models.User{
 		UpdatedAt: time.Now(),
 	}
-	//Mybe need to move this code to function
+
 	if err := c.BindJSON(&u); err != nil {
-		h.DB.Logger.Error("error bindJSON", zap.Error(err))
-		c.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse(fmt.Sprintf("Bad request: %s", err)))
+		e := middleware.NewHttpError("bad request", err.Error(), http.StatusBadRequest)
+		c.Error(e)
 		return
 	}
 
 	newAccount, err := h.DB.EditUser(c.Param("id"), &u, c.Request.Context())
 	if err != nil {
-		if err == h.DB.GetErrValidateID() {
-			c.JSON(http.StatusBadRequest, response.ErrorResponse(h.DB.GetErrValidateID().Error()))
-			return
-		}
-		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse("Internal server error"))
-		return
-	}
-
-	if newAccount == nil {
-		c.JSON(http.StatusNotFound, response.NotFound())
+		c.Error(err)
 		return
 	}
 
@@ -87,18 +67,9 @@ func (h *Handler) EditUser(c *gin.Context) {
 }
 
 func (h *Handler) DeleteUser(c *gin.Context) {
-	u, err := h.DB.DeleteUser(c.Param("id"), c.Request.Context())
+	err := h.DB.DeleteUser(c.Param("id"), c.Request.Context())
 	if err != nil {
-		if err == h.DB.GetErrValidateID() {
-			c.JSON(http.StatusBadRequest, response.ErrorResponse(h.DB.GetErrValidateID().Error()))
-			return
-		}
-		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse("Internal server error"))
-		return
-	}
-
-	if u == nil {
-		c.JSON(http.StatusNotFound, response.NotFound())
+		c.Error(err)
 		return
 	}
 

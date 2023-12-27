@@ -30,7 +30,7 @@ func main() {
 		log.Fatalf("error creating logger: %s", err)
 	}
 
-	db := database.Init(dsn, logger)
+	db := database.Init(dsn)
 	err = db.Ping()
 	if err != nil {
 		log.Fatalf("Cannot connect to DB. %s", err)

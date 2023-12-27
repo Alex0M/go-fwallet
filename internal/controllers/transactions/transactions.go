@@ -2,23 +2,19 @@ package transactions
 
 import (
 	"fmt"
+	"go-fwallet/internal/middleware"
 	"go-fwallet/internal/models"
 	"go-fwallet/internal/response"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 )
 
 func (h *Handler) GetAllTransaction(c *gin.Context) {
 	t, err := h.DB.GetAllTransaction(getQueryParametersToStruct(c), c.Request.Context())
 	if err != nil {
-		if err == h.DB.GetErrValidateID() {
-			c.JSON(http.StatusBadRequest, response.ErrorResponse(h.DB.GetErrValidateID().Error()))
-			return
-		}
-		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse("Internal server error"))
+		c.Error(err)
 		return
 	}
 
@@ -28,7 +24,7 @@ func (h *Handler) GetAllTransaction(c *gin.Context) {
 func (h *Handler) GetSumOfTransactionsByCategory(c *gin.Context) {
 	t, err := h.DB.GetSumOfTransactionsByCategory(getQueryParametersToStruct(c), c.Request.Context())
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse("Internal server error"))
+		c.Error(err)
 		return
 	}
 
@@ -38,16 +34,7 @@ func (h *Handler) GetSumOfTransactionsByCategory(c *gin.Context) {
 func (h *Handler) GetTransaction(c *gin.Context) {
 	t, err := h.DB.GetTransaction(c.Param("id"), c.Request.Context())
 	if err != nil {
-		if err == h.DB.GetErrValidateID() {
-			c.JSON(http.StatusBadRequest, response.ErrorResponse(h.DB.GetErrValidateID().Error()))
-			return
-		}
-		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse("Internal server error"))
-		return
-	}
-
-	if t == nil {
-		c.JSON(http.StatusNotFound, response.NotFound())
+		c.Error(err)
 		return
 	}
 
@@ -57,14 +44,14 @@ func (h *Handler) GetTransaction(c *gin.Context) {
 func (h *Handler) AddTransaction(c *gin.Context) {
 	var t models.Transaction
 	if err := c.BindJSON(&t); err != nil {
-		h.DB.Logger.Error("error bindJSON", zap.Error(err))
-		c.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse(fmt.Sprintf("Bad request: %s", err)))
+		e := middleware.NewHttpError("bad request", err.Error(), http.StatusBadRequest)
+		c.Error(e)
 		return
 	}
 
 	err := h.DB.AddTransaction(&t, c.Request.Context())
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse("Internal server error"))
+		c.Error(err)
 		return
 	}
 
@@ -77,23 +64,14 @@ func (h *Handler) EditTransaction(c *gin.Context) {
 	}
 
 	if err := c.BindJSON(&t); err != nil {
-		h.DB.Logger.Error("error bindJSON", zap.Error(err))
-		c.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse(fmt.Sprintf("Bad request: %s", err)))
+		e := middleware.NewHttpError("bad request", err.Error(), http.StatusBadRequest)
+		c.Error(e)
 		return
 	}
 
 	newTransaction, err := h.DB.EditTransaction(c.Param("id"), &t, c.Request.Context())
 	if err != nil {
-		if err == h.DB.GetErrValidateID() {
-			c.JSON(http.StatusBadRequest, response.ErrorResponse(h.DB.GetErrValidateID().Error()))
-			return
-		}
-		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse("Internal server error"))
-		return
-	}
-
-	if newTransaction == nil {
-		c.JSON(http.StatusNotFound, response.NotFound())
+		c.Error(err)
 		return
 	}
 
@@ -101,18 +79,9 @@ func (h *Handler) EditTransaction(c *gin.Context) {
 }
 
 func (h *Handler) DeleteTransaction(c *gin.Context) {
-	t, err := h.DB.DeleteTransaction(c.Param("id"), c.Request.Context())
+	err := h.DB.DeleteTransaction(c.Param("id"), c.Request.Context())
 	if err != nil {
-		if err == h.DB.GetErrValidateID() {
-			c.JSON(http.StatusBadRequest, response.ErrorResponse(h.DB.GetErrValidateID().Error()))
-			return
-		}
-		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse("Internal server error"))
-		return
-	}
-
-	if t == nil {
-		c.JSON(http.StatusNotFound, response.NotFound())
+		c.Error(err)
 		return
 	}
 
@@ -122,14 +91,14 @@ func (h *Handler) DeleteTransaction(c *gin.Context) {
 func (h *Handler) UpdateTransactionCategories(c *gin.Context) {
 	var tap models.TransactionAPIRequestParams
 	if err := c.BindJSON(&tap); err != nil {
-		h.DB.Logger.Error("error bindJSON", zap.Error(err))
-		c.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse(fmt.Sprintf("Bad request: %s", err)))
+		e := middleware.NewHttpError("bad request", err.Error(), http.StatusBadRequest)
+		c.Error(e)
 		return
 	}
 
 	rows, err := h.DB.UpdateTransactionCategories(&tap, c.Request.Context())
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorResponse("Internal server error"))
+		c.Error(err)
 		return
 	}
 
