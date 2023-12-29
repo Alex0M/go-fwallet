@@ -2,7 +2,12 @@ package database
 
 import (
 	"context"
+	"database/sql"
+	"fmt"
+	"go-fwallet/internal/helpers"
+	"go-fwallet/internal/middleware"
 	"go-fwallet/internal/models"
+	"net/http"
 	"time"
 )
 
@@ -24,11 +29,63 @@ func (d *Database) GetAccountsStatements(closingDate string, isClosingDateSpecif
 
 func (d *Database) CreateAccountsStatements(rp *models.AccountStatementRequestPayload, c context.Context) ([]models.AccountStatement, error) {
 	var ass []models.AccountStatement
+	var a []int
 
-	err := d.Client.NewRaw(
-		"SELECT account_id, sum(amount) FILTER (where transaction_type_code = 'W') as total_credit, sum(amount) FILTER (where transaction_type_code = 'D') as total_debit FROM public.transactions WHERE transaction_date >= ? and transaction_date <= ? group by account_id",
-		rp.GteDate, rp.LteDate,
-	).Scan(c, &ass)
+	err := d.Client.NewSelect().ColumnExpr("account_id").TableExpr("transactions").Where("transaction_date >= ? and transaction_date <= ?", rp.GteDate, rp.LteDate).GroupExpr("account_id").Scan(c, &a)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, v := range a {
+		as, err := d.CreateAccountStatement(fmt.Sprint(v), rp, c)
+		if err != nil {
+			return nil, err
+		}
+		ass = append(ass, *as)
+	}
+
+	return ass, nil
+}
+
+func (d *Database) GetAccountStatement(idStr string, closingDate string, isClosingDateSpecify bool, c context.Context) (*models.AccountStatement, error) {
+	id, err := helpers.StringToInt(idStr)
+	if err != nil {
+		return nil, middleware.NewHttpError("cannot conver account id to int", err.Error(), http.StatusBadRequest)
+	}
+
+	var as models.AccountStatement
+	q := d.Client.NewSelect().Model(&as).Where("account_id = ?", id)
+	if isClosingDateSpecify {
+		q.Where("closing_date = ?", closingDate)
+	}
+
+	err = q.Scan(c)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, middleware.NewHttpError("account statment not found", fmt.Sprintf("accountID:%d", id), http.StatusNotFound)
+		}
+		return nil, err
+	}
+
+	return &as, nil
+}
+
+func (d *Database) CreateAccountStatement(idStr string, rp *models.AccountStatementRequestPayload, c context.Context) (*models.AccountStatement, error) {
+	id, err := helpers.StringToInt(idStr)
+	if err != nil {
+		return nil, middleware.NewHttpError("cannot conver account id to int", err.Error(), http.StatusBadRequest)
+	}
+
+	var as models.AccountStatement
+	err = d.Client.NewSelect().
+		ColumnExpr("account_id").
+		ColumnExpr("sum(amount) FILTER (where transaction_type_code = 'W') as total_credit").
+		ColumnExpr("sum(amount) FILTER (where transaction_type_code = 'D') as total_debit").
+		TableExpr("transactions").
+		Where("transaction_date >= ? and transaction_date <= ? and account_id = ?", rp.GteDate, rp.LteDate, id).
+		GroupExpr("account_id").
+		Scan(c, &as)
+
 	if err != nil {
 		return nil, err
 	}
@@ -38,15 +95,22 @@ func (d *Database) CreateAccountsStatements(rp *models.AccountStatementRequestPa
 		return nil, err
 	}
 
-	for i := range ass {
-		ass[i].ClosingBalance = ass[i].TotalDebit - ass[i].TotalCredit
-		ass[i].ClosingDate = closingDate.AddDate(0, 0, 1)
-	}
+	as.ClosingBalance = as.TotalDebit - as.TotalCredit
+	as.ClosingDate = closingDate.AddDate(0, 0, 1)
 
-	_, err = d.Client.NewInsert().Model(&ass).Exec(c)
-	if err != nil {
+	err = d.Client.NewRaw(`WITH upsert AS (
+								UPDATE account_statements 
+								SET updated_at = ?5
+								WHERE (account_id = ?0 and closing_date = ?1)
+								RETURNING *
+							) 
+							INSERT INTO account_statements (account_id, closing_date, closing_balance, total_credit, total_debit) 
+							SELECT ?0, ?1, ?2, ?3, ?4 
+							WHERE NOT EXISTS (SELECT 1 FROM upsert)`, id, as.ClosingDate.Format("2006-01-02"), as.ClosingBalance, as.TotalCredit, as.TotalDebit, time.Now()).Scan(c, &as)
+
+	if err != nil && err != sql.ErrNoRows {
 		return nil, err
 	}
 
-	return ass, nil
+	return &as, nil
 }

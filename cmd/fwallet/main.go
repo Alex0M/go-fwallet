@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"go-fwallet/internal/controllers/accounts"
+	accountsstatements "go-fwallet/internal/controllers/accounts_statemets"
 	"go-fwallet/internal/controllers/categories"
 	commoncontroller "go-fwallet/internal/controllers/common_controller"
 	"go-fwallet/internal/controllers/transactions"
@@ -53,6 +54,7 @@ func main() {
 	categories.RegisterRoutes(r, db)
 	users.RegisterRoutes(r, db)
 	transactiontypes.RegisterRoutes(r, db)
+	accountsstatements.RegisterRoutes(r, db)
 	commoncontroller.RegisterRoutes(r, nil)
 
 	//Move Servier IP and Port to config
