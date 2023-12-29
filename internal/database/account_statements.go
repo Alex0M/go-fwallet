@@ -11,10 +11,14 @@ import (
 	"time"
 )
 
-func (d *Database) GetAccountsStatements(closingDate string, isClosingDateSpecify bool, c context.Context) ([]models.AccountStatement, error) {
-	var ass []models.AccountStatement
+func (d *Database) GetAccountsStatements(closingDate string, isClosingDateSpecify bool, c context.Context) ([]models.AccountStatementAPIResponce, error) {
+	var ass []models.AccountStatementAPIResponce
 
-	q := d.Client.NewSelect().Model(&ass)
+	q := d.Client.NewSelect().Model(&ass).
+		ColumnExpr("accss.closing_balance, accss.total_credit, accss.total_debit").
+		ColumnExpr("a.name as account").
+		Join("LEFT JOIN accounts as a ON accss.account_id = a.id")
+
 	if isClosingDateSpecify {
 		q.Where("closing_date = ?", closingDate)
 	}
@@ -47,14 +51,19 @@ func (d *Database) CreateAccountsStatements(rp *models.AccountStatementRequestPa
 	return ass, nil
 }
 
-func (d *Database) GetAccountStatement(idStr string, closingDate string, isClosingDateSpecify bool, c context.Context) (*models.AccountStatement, error) {
+func (d *Database) GetAccountStatement(idStr string, closingDate string, isClosingDateSpecify bool, c context.Context) (*models.AccountStatementAPIResponce, error) {
 	id, err := helpers.StringToInt(idStr)
 	if err != nil {
 		return nil, middleware.NewHttpError("cannot conver account id to int", err.Error(), http.StatusBadRequest)
 	}
 
-	var as models.AccountStatement
-	q := d.Client.NewSelect().Model(&as).Where("account_id = ?", id)
+	var as models.AccountStatementAPIResponce
+	q := d.Client.NewSelect().Model(&as).
+		ColumnExpr("accss.closing_balance, accss.total_credit, accss.total_debit").
+		ColumnExpr("a.name as account").
+		Join("LEFT JOIN accounts as a ON accss.account_id = a.id").
+		Where("account_id = ?", id)
+
 	if isClosingDateSpecify {
 		q.Where("closing_date = ?", closingDate)
 	}
