@@ -45,7 +45,7 @@ func (h *Handler) GetAccountStatement(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, response.SuccessResponse("All accounts statemets", ass))
+	c.JSON(http.StatusOK, response.SuccessResponse("Account statemet", ass))
 }
 
 func (h *Handler) CreateAccountStatement(c *gin.Context) {
