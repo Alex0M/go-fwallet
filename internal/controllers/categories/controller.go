@@ -19,7 +19,7 @@ func RegisterRoutes(r *gin.Engine, db *database.Database) {
 	routes.GET("", h.GetCategories)
 	routes.GET("/:id", h.GetCategory)
 	routes.GET("/name/:name", h.GetCategoryByName)
-	routes.POST("/", h.AddCategory)
+	routes.POST("", h.AddCategory)
 	routes.PUT("/:id", h.EditCategory)
 	routes.DELETE("/:id", h.DeleteCategory)
 }
