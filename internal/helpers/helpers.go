@@ -15,6 +15,10 @@ func HashAndSalt(pass []byte) (string, error) {
 	return string(hashed), nil
 }
 
+func CompareHashAndPassword(hashedPassword, password []byte) error {
+	return bcrypt.CompareHashAndPassword(hashedPassword, password)
+}
+
 func StringToInt(s string) (int, error) {
 	n, err := strconv.Atoi(s)
 	if err != nil {

@@ -88,3 +88,21 @@ func (d *Database) DeleteUser(idStr string, c context.Context) error {
 
 	return nil
 }
+
+func (d *Database) LoginCheck(u *models.UserLogin, c context.Context) (*models.User, error) {
+	var user models.User
+	err := d.Client.NewSelect().Model(&user).Where("email = ?", u.Email).Scan(c)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, middleware.NewHttpError("login or password is incorect", err.Error(), http.StatusUnauthorized)
+		}
+		return nil, err
+	}
+
+	err = helpers.CompareHashAndPassword([]byte(user.Password), []byte(u.Password))
+	if err != nil {
+		return nil, middleware.NewHttpError("login or password is incorect", err.Error(), http.StatusUnauthorized)
+	}
+
+	return &user, nil
+}
