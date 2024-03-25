@@ -2,12 +2,13 @@ package auth
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 )
 
-var jwtKey = []byte("mySecret")
+var jwtKey = []byte(os.Getenv("JWT_KEY"))
 var tokenLifeSpan = 1
 
 func GenerateToken(email, username string) (string, error) {

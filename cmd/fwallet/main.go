@@ -10,6 +10,7 @@ import (
 	accountsstatements "go-fwallet/internal/controllers/accounts_statemets"
 	"go-fwallet/internal/controllers/categories"
 	commoncontroller "go-fwallet/internal/controllers/common_controller"
+	"go-fwallet/internal/controllers/login"
 	"go-fwallet/internal/controllers/transactions"
 	"go-fwallet/internal/controllers/transactiontypes"
 	"go-fwallet/internal/controllers/users"
@@ -56,6 +57,7 @@ func main() {
 	transactiontypes.RegisterRoutes(r, db)
 	accountsstatements.RegisterRoutes(r, db)
 	commoncontroller.RegisterRoutes(r, nil)
+	login.RegisterRoutes(r, db)
 
 	//Move Servier IP and Port to config
 	log.Fatal(r.Run("0.0.0.0:9090"))

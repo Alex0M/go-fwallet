@@ -10,3 +10,8 @@ type User struct {
 	CreatedAt time.Time `json:"-" bun:"default:current_timestamp"`
 	UpdatedAt time.Time `json:"-" bun:"default:current_timestamp"`
 }
+
+type UserLogin struct {
+	Email    string `json:"email" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
