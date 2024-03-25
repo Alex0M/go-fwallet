@@ -94,18 +94,14 @@ func (d *Database) LoginCheck(u *models.UserLogin, c context.Context) (*models.U
 	err := d.Client.NewSelect().Model(&user).Where("email = ?", u.Email).Scan(c)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, middleware.NewHttpError("login or password is incorect", fmt.Sprintf("email:%s", u.Email), http.StatusUnauthorized)
+			return nil, middleware.NewHttpError("login or password is incorect", err.Error(), http.StatusUnauthorized)
 		}
 		return nil, err
 	}
 
-	hashedPass, err := helpers.HashAndSalt([]byte(u.Password))
+	err = helpers.CompareHashAndPassword([]byte(user.Password), []byte(u.Password))
 	if err != nil {
-		return nil, err
-	}
-
-	if hashedPass != user.Password {
-		return nil, middleware.NewHttpError("login or password is incorect", fmt.Sprintf("email:%s", u.Email), http.StatusUnauthorized)
+		return nil, middleware.NewHttpError("login or password is incorect", err.Error(), http.StatusUnauthorized)
 	}
 
 	return &user, nil
