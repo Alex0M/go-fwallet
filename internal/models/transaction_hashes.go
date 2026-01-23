@@ -3,8 +3,8 @@ package models
 import "time"
 
 type TransactionHash struct {
-	ID        int       `json:"transactionID"`
-	Hash      string    `json:"hash"`
-	CreatedAt time.Time `json:"-" bun:"default:current_timestamp"`
-	UpdatedAt time.Time `json:"-" bun:"default:current_timestamp"`
+	TransactionID int       `json:"transactionID"`
+	Hash          string    `json:"hash"`
+	CreatedAt     time.Time `json:"-" bun:"default:current_timestamp"`
+	UpdatedAt     time.Time `json:"-" bun:"default:current_timestamp"`
 }
