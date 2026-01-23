@@ -55,7 +55,7 @@ func (h *Handler) AddTransaction(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, response.SuccessResponse("Transaction was created successfully", nil))
+	c.JSON(http.StatusCreated, response.SuccessResponse("Transaction was created successfully", t))
 }
 
 func (h *Handler) EditTransaction(c *gin.Context) {
