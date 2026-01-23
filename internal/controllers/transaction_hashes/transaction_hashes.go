@@ -33,5 +33,5 @@ func (h *Handler) AddTransactionHash(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, response.SuccessResponse("Transaction hash was created successfully", nil))
+	c.JSON(http.StatusCreated, response.SuccessResponse("Transaction hash was created successfully", th))
 }
