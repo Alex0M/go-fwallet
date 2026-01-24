@@ -11,6 +11,7 @@ import (
 	"go-fwallet/internal/controllers/categories"
 	commoncontroller "go-fwallet/internal/controllers/common_controller"
 	"go-fwallet/internal/controllers/login"
+	transactionhashes "go-fwallet/internal/controllers/transaction_hashes"
 	"go-fwallet/internal/controllers/transactions"
 	"go-fwallet/internal/controllers/transactiontypes"
 	"go-fwallet/internal/controllers/users"
@@ -56,6 +57,7 @@ func main() {
 	users.RegisterRoutes(r, db)
 	transactiontypes.RegisterRoutes(r, db)
 	accountsstatements.RegisterRoutes(r, db)
+	transactionhashes.RegisterRoutes(r, db)
 	commoncontroller.RegisterRoutes(r, nil)
 	login.RegisterRoutes(r, db)
 
